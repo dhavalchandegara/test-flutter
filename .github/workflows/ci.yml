@@ -59,7 +59,7 @@ jobs:
           RESPONSE=$(curl -s -X POST "https://api.appetize.io/v1/apps" \
             -H "Content-Type: multipart/form-data" \
             -F "file=@build/app/outputs/flutter-apk/app-release.apk" \
-            -F "token=${{ secrets.TOKEN }}")
+            -F "token=${{ secrets.API_TOKEN }}")
 
           echo "Appetize.io Response: $RESPONSE"
           
