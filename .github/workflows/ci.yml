@@ -60,4 +60,4 @@ jobs:
           fi
 
       - name: Display Appetize.io Link
-        run: echo "Test your app here: ${{ env.APPETIZE_URL }}"
+        run: echo "Test your app here:${{ env.APPETIZE_URL }}"
