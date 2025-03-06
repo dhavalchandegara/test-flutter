@@ -42,6 +42,18 @@ jobs:
       - name: Build APK
         run: flutter build apk --release
 
+      - name: Verify APK File Exists
+        run: |
+          if [ ! -f "build/app/outputs/flutter-apk/app-release.apk" ]; then
+            echo "❌ APK file not found! Check build process."
+            exit 1
+          else
+            echo "✅ APK found: build/app/outputs/flutter-apk/app-release.apk"
+          fi
+
+      - name: Install jq for JSON Parsing
+        run: sudo apt-get install jq -y
+
       - name: Upload APK to Appetize.io
         run: |
           RESPONSE=$(curl -s -X POST "https://api.appetize.io/v1/apps" \
@@ -49,15 +61,17 @@ jobs:
             -F "file=@build/app/outputs/flutter-apk/app-release.apk" \
             -F "token=${{ secrets.APPETIZE_API_TOKEN }}")
 
+          echo "Appetize.io Response: $RESPONSE"
+          
           APP_URL=$(echo $RESPONSE | jq -r '.publicURL')
 
-          if [ "$APP_URL" != "null" ]; then
-            echo "Your app is available at: $APP_URL"
+          if [ "$APP_URL" != "null" ] && [ -n "$APP_URL" ]; then
+            echo "✅ Your app is available at: $APP_URL"
             echo "APPETIZE_URL=$APP_URL" >> $GITHUB_ENV
           else
-            echo "Failed to upload APK to Appetize.io"
+            echo "❌ Failed to upload APK to Appetize.io. Check API token and response."
             exit 1
           fi
 
       - name: Display Appetize.io Link
-        run: echo "Test your app here:${{ env.APPETIZE_URL }}"
+        run: echo "🔗 Test your app here: ${{ env.APPETIZE_URL }}"
